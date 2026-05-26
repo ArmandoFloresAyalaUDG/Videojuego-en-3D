@@ -4,68 +4,71 @@ using UnityEngine.InputSystem;
 public class Disparador : MonoBehaviour
 {
     public GameObject prefabProyectil;
+
     private float cadencia = 0.4f;
     private float tiempoUltimoDisparo = 0f;
-    private SpawnManager spawnManager;
+    private GestorNiveles gestorNiveles;
 
     void Start()
     {
-        spawnManager = FindFirstObjectByType<SpawnManager>();
+        gestorNiveles = FindFirstObjectByType<GestorNiveles>();
     }
 
     void Update()
     {
-        ActualizarNivel();
+        ActualizarCadencia();
 
         if (Mouse.current.leftButton.isPressed && Time.time >= tiempoUltimoDisparo + cadencia)
         {
-            int oleada = spawnManager != null ? spawnManager.oleadaActual : 1;
-
-            if (oleada >= 5)
-                Disparar(3);
-            else
-                Disparar(1);
-
+            int balas = gestorNiveles != null ? gestorNiveles.ProyectilesPorDisparo : 1;
+            Disparar(balas);
             tiempoUltimoDisparo = Time.time;
         }
     }
 
-    void ActualizarNivel()
+    void ActualizarCadencia()
     {
-        if (spawnManager == null) return;
+        if (gestorNiveles == null) return;
 
-        int oleada = spawnManager.oleadaActual;
+        int oleada = gestorNiveles.OleadaActual;
 
         if (oleada >= 5)
-            cadencia = 0.2f;       // Oleada 5+: ráfaga triple rápida
+            cadencia = 0.2f;
         else if (oleada >= 3)
-            cadencia = 0.25f;      // Oleada 3-4: más rápida
+            cadencia = 0.25f;
         else
-            cadencia = 0.4f;       // Oleada 1-2: normal
+            cadencia = 0.4f;
     }
 
     public void Disparar(int cantidadBalas)
     {
         Vector3 direccion = ObtenerDireccionCursor();
+        float velocidad = gestorNiveles != null ? gestorNiveles.VelocidadProyectil : 10f;
 
         if (cantidadBalas == 1)
         {
-            SpawnProyectil(direccion, 0f);
+            SpawnProyectil(direccion, 0f, velocidad);
         }
-        else if (cantidadBalas == 3)
+        else
         {
-            SpawnProyectil(direccion, -15f);
-            SpawnProyectil(direccion, 0f);
-            SpawnProyectil(direccion, 15f);
+            float offsetBase = 15f;
+            int mitad = cantidadBalas / 2;
+
+            for (int i = 0; i < cantidadBalas; i++)
+            {
+                float offset = (i - mitad) * offsetBase;
+                SpawnProyectil(direccion, offset, velocidad);
+            }
         }
     }
 
-    void SpawnProyectil(Vector3 dir, float offsetAngulo)
+    void SpawnProyectil(Vector3 dir, float offsetAngulo, float velocidad)
     {
         Quaternion rotacion = Quaternion.Euler(0f, offsetAngulo, 0f);
         Vector3 dirFinal = rotacion * dir;
         GameObject p = Instantiate(prefabProyectil, transform.position + Vector3.up * 0.5f, Quaternion.identity);
-        p.GetComponent<MovimientoProyectil>().Inicializar(dirFinal);
+        MovimientoProyectil mp = p.GetComponent<MovimientoProyectil>();
+        if (mp != null) mp.Inicializar(dirFinal, velocidad);
     }
 
     Vector3 ObtenerDireccionCursor()
@@ -81,4 +84,4 @@ public class Disparador : MonoBehaviour
         }
         return transform.forward;
     }
-}
+} 

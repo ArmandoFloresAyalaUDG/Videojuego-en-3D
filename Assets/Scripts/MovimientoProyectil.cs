@@ -2,12 +2,13 @@ using UnityEngine;
 
 public class MovimientoProyectil : MonoBehaviour
 {
-    public float velocidad = 10f;
+    private float velocidad = 10f;
     private Vector3 direccion;
 
-    public void Inicializar(Vector3 dir)
+    public void Inicializar(Vector3 dir, float vel = 10f)
     {
         direccion = dir.normalized;
+        velocidad = vel;
     }
 
     void Update()

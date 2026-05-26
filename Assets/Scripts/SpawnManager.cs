@@ -3,20 +3,22 @@ using System.Collections;
 
 public class SpawnManager : MonoBehaviour
 {
-    [Header("Configuración")]
+    [Header("Configuración de spawn")]
     public GameObject prefabEnemigo;
     public float radioSpawn = 8f;
-
-    [Header("Oleadas")]
-    public int oleadaActual = 1;
-    public int enemigosBaseXOleada = 3;
     public float tiempoEntreOleadas = 5f;
 
+    private GestorNiveles gestorNiveles;
     private int enemigosVivos = 0;
     private bool esperandoOleada = false;
 
     void Start()
     {
+        gestorNiveles = FindFirstObjectByType<GestorNiveles>();
+
+        if (gestorNiveles == null)
+            Debug.LogError("[SpawnManager] No se encontró GestorNiveles en la escena.");
+
         IniciarOleada();
     }
 
@@ -34,18 +36,17 @@ public class SpawnManager : MonoBehaviour
     IEnumerator SiguienteOleada()
     {
         yield return new WaitForSeconds(tiempoEntreOleadas);
-        oleadaActual++;
+        gestorNiveles?.AvanzarNivel();
         IniciarOleada();
         esperandoOleada = false;
     }
 
     void IniciarOleada()
     {
-        int cantidad = enemigosBaseXOleada + (oleadaActual - 1) * 2;
+        int cantidad = gestorNiveles != null ? gestorNiveles.CantidadEnemigos : 3;
+
         for (int i = 0; i < cantidad; i++)
-        {
             SpawnEnemigo();
-        }
     }
 
     void SpawnEnemigo()
@@ -56,6 +57,12 @@ public class SpawnManager : MonoBehaviour
             1f,
             Mathf.Sin(angulo) * radioSpawn
         );
-        Instantiate(prefabEnemigo, posicion, Quaternion.identity);
+
+        GameObject enemigo = Instantiate(prefabEnemigo, posicion, Quaternion.identity);
+
+        // Pasar velocidad del nivel actual al enemigo
+        EnemigoIA ia = enemigo.GetComponent<EnemigoIA>();
+        if (ia != null && gestorNiveles != null)
+            ia.velocidadBase = gestorNiveles.VelocidadEnemigos;
     }
 }

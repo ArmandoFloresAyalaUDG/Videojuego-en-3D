@@ -15,11 +15,8 @@ public class EnemigoIA : MonoBehaviour
         GameObject obj = GameObject.FindWithTag("Jugador");
         if (obj != null) jugador = obj.transform;
 
-        SpawnManager sm = FindFirstObjectByType<SpawnManager>();
-        if (sm != null)
-            velocidadFinal = velocidadBase + (sm.oleadaActual - 1) * 0.3f;
-        else
-            velocidadFinal = velocidadBase;
+        // velocidadBase ya fue asignada por SpawnManager antes de Start()
+        velocidadFinal = velocidadBase;
 
         // Aparece bajo el suelo
         transform.position = new Vector3(transform.position.x, -2f, transform.position.z);

@@ -4,22 +4,28 @@ using TMPro;
 
 public class GestorJuego : MonoBehaviour
 {
-    [Header("UI - HUD")]
+    [Header("UI - HUD existente")]
     public TextMeshProUGUI textoOleada;
     public TextMeshProUGUI textoEnemigos;
     public TextMeshProUGUI textoRecord;
+
+    [Header("UI - Panel Enemigos (izquierda)")]
+    public TextMeshProUGUI panelEnemigos;
+
+    [Header("UI - Panel Jugador (derecha)")]
+    public TextMeshProUGUI panelJugador;
 
     [Header("UI - Game Over")]
     public GameObject panelGameOver;
     public TextMeshProUGUI textoFinal;
 
-    private SpawnManager spawnManager;
+    private GestorNiveles gestorNiveles;
     private int enemigosEliminados = 0;
     private int record = 0;
 
     void Start()
     {
-        spawnManager = FindFirstObjectByType<SpawnManager>();
+        gestorNiveles = FindFirstObjectByType<GestorNiveles>();
         record = PlayerPrefs.GetInt("Record", 0);
         panelGameOver.SetActive(false);
         ActualizarUI();
@@ -59,8 +65,21 @@ public class GestorJuego : MonoBehaviour
 
     void ActualizarUI()
     {
-        if (spawnManager != null)
-            textoOleada.text = "Oleada: " + spawnManager.oleadaActual;
+        if (gestorNiveles != null)
+        {
+            textoOleada.text = "Oleada: " + gestorNiveles.OleadaActual;
+
+            panelEnemigos.text =
+                "<b>— ENEMIGOS —</b>\n" +
+                "Oleada: " + gestorNiveles.OleadaActual + "\n" +
+                "Cantidad: " + gestorNiveles.CantidadEnemigos + "\n" +
+                "Velocidad: " + gestorNiveles.VelocidadEnemigos.ToString("F1");
+
+            panelJugador.text =
+                "<b>— JUGADOR —</b>\n" +
+                "Proyectiles: " + gestorNiveles.ProyectilesPorDisparo + "\n" +
+                "Vel. proyectil: " + gestorNiveles.VelocidadProyectil.ToString("F1");
+        }
 
         textoEnemigos.text = "Eliminados: " + enemigosEliminados;
         textoRecord.text = "Récord: " + record;

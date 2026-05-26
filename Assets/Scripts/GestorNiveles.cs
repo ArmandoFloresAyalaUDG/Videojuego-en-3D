@@ -38,10 +38,10 @@ public class GestorNiveles : MonoBehaviour
 
     // ─── Propiedades calculadas ───────────────────────────────────────────────
 
-    public float VelocidadEnemigos => DatosActuales().velocidadEnemigos;
+    public virtual float VelocidadEnemigos => DatosActuales().velocidadEnemigos;
     public float VelocidadProyectil => DatosActuales().velocidadProyectil;
-    public int CantidadEnemigos => 3 + (OleadaActual - 1) * 2;
-    public int ProyectilesPorDisparo => 1 + (OleadaActual - 1) / 3;
+    public virtual int CantidadEnemigos => 3 + (OleadaActual - 1) * 2;
+    public virtual int ProyectilesPorDisparo => 1 + (OleadaActual - 1) / 3;
 
     // ─── Inicialización ───────────────────────────────────────────────────────
 
